@@ -44,17 +44,6 @@ public class MainPanel extends AbstractMainPanel {
         } else throw new InputMismatchException();
     }
 
-    @Override
-    protected void populateChildren() throws IOException, ClassNotFoundException {
-        Class<?> currentClass = this.getClass();
-        String packageName = currentClass.getPackage().getName();
-        List<String> subPackages = getSubPackages(packageName);
-        if (!subPackages.isEmpty()) {
-            for (String subPackage :subPackages) {
-                children.addAll(getClassesInCurrentPackage(subPackage, true));
-            }
-        }
-    }
 }
 
 
