@@ -104,9 +104,8 @@ public class StandardOutput implements Output {
         output.printf("Отчет за период: c %s до %s %n", startDate.format(dateFormat), endDate.format(dateFormat));
         output.printf("""
                 Общий доход: %.2f
-                Общие расходы: %.2f
+                Общий расходы: %.2f
                 """, income, expenses);
         fPrintAppTransaction(appTransactions);
     }
-
 }

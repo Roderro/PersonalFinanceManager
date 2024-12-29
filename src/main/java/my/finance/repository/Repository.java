@@ -1,9 +1,5 @@
 package my.finance.repository;
 
-import my.finance.models.User;
-import org.hibernate.HibernateException;
-
-import java.util.List;
 import java.util.Optional;
 
 public interface Repository<T> {

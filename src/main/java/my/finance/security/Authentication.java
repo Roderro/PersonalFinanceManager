@@ -1,7 +1,5 @@
 package my.finance.security;
 
-import my.finance.models.User;
-
 import java.util.Optional;
 
 public interface Authentication {

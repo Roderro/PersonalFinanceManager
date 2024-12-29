@@ -74,7 +74,7 @@ public class AppTransactionRepository extends AbstractRepository<AppTransaction>
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             Query<Object[]> query = session.createQuery(
-                    "SELECT ap.budgetCategory.categoryName, ap.budgetCategory.budgetLimit , ap.budgetCategory.budgetLimit + SUM(ap.amount)" +
+                    "SELECT ap.budgetCategory.categoryName, SUM(ap.amount) , ap.budgetCategory.budgetLimit + SUM(ap.amount)" +
                             "FROM AppTransaction ap " +
                             "WHERE ap.wallet.id = :walletId " +
                             "AND ap.budgetCategory.isIncome = false " +
@@ -161,6 +161,4 @@ public class AppTransactionRepository extends AbstractRepository<AppTransaction>
             return result;
         }
     }
-
-
 }

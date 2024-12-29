@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "transactions")
@@ -75,7 +73,11 @@ public class AppTransaction {
     }
 
     public void setAmount(double amount) {
-        this.amount = amount;
+        if (isIncome())
+            this.amount = Math.abs(amount);
+        else {
+            this.amount = -Math.abs(amount);
+        }
     }
 
     public BudgetCategory getBudgetCategory() {

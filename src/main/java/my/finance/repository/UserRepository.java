@@ -1,13 +1,10 @@
 package my.finance.repository;
 
 import jakarta.persistence.TypedQuery;
-import my.finance.Utils.HibernateUtil;
 import my.finance.models.User;
 import my.finance.models.Wallet;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;

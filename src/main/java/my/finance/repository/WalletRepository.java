@@ -1,18 +1,12 @@
 package my.finance.repository;
 
-import my.finance.Utils.HibernateUtil;
-import my.finance.models.AppTransaction;
-import my.finance.models.BudgetCategory;
-import my.finance.models.User;
 import my.finance.models.Wallet;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class WalletRepository extends AbstractRepository<Wallet> {
 

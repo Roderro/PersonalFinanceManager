@@ -1,6 +1,5 @@
 package my.finance.transport;
 
-import java.util.Optional;
 import java.util.Scanner;
 
 public class StandardInput implements Input {

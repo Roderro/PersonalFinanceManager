@@ -1,20 +1,14 @@
 package my.finance.repository;
 
-
-import jdk.jfr.Category;
-import my.finance.Utils.HibernateUtil;
 import my.finance.models.BudgetCategory;
 import my.finance.models.User;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public class BudgetCategoryRepository extends  AbstractRepository<BudgetCategory>{
+public class BudgetCategoryRepository extends AbstractRepository<BudgetCategory> {
 
     public BudgetCategoryRepository() {
         super(BudgetCategory.class);
