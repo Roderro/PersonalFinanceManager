@@ -50,6 +50,10 @@ public class StandardOutput implements Output {
         output.flush();
     }
 
+    public void printLine(int size){
+        String lineString = "-".repeat(size);
+        output.println(lineString);
+    }
 
     public void fPrintCategories(List<BudgetCategory> incomeCategories,
                                  List<BudgetCategory> expenseCategories) {

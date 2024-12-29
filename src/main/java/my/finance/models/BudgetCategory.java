@@ -20,7 +20,7 @@ public class BudgetCategory {
     @JoinColumn(name = "wallet_id",referencedColumnName = "id", nullable = false)
     private Wallet wallet;
 
-    @Column(name = "category_name", nullable = false, unique = true)
+    @Column(name = "category_name", nullable = false)
     private String categoryName;
 
     @Column(name = "is_income", nullable = false)

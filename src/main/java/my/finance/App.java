@@ -1,8 +1,8 @@
 package my.finance;
 
-import my.finance.ioconsole.MainPanel;
+import my.finance.ioconsole.main.MainPanel;
 import my.finance.ioconsole.Panel;
-import my.finance.ioconsole._authentication.AuthenticationMainPanel;
+import my.finance.ioconsole.authentication.AuthenticationMainPanel;
 import my.finance.ioconsole.PanelManager;
 import my.finance.models.BudgetCategory;
 import my.finance.models.AppTransaction;
@@ -24,11 +24,6 @@ import java.util.logging.LogManager;
 public class App {
 
     public static void main(String[] args) {
-        try {
-            LogManager.getLogManager().readConfiguration(new FileInputStream("src/main/resources/logging.properties"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         boolean genTestData = false;
         Panel startPanel;
         if (genTestData) {

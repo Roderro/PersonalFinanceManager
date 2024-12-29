@@ -13,11 +13,9 @@
         <!-- Диалект базы данных -->
         <property name="dialect">org.hibernate.dialect.H2Dialect</property>
 
-        <!-- Показывать SQL-запросы в консоли -->
         <property name="show_sql">false</property>
         <property name="format_sql">false</property>
         <property name="use_sql_comments">false</property>
-        <!-- Автоматическое создание таблиц при запуске приложения -->
         <property name="hbm2ddl.auto">update</property>
 
     </session-factory>

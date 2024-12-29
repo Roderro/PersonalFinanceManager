@@ -41,8 +41,6 @@ public class AbstractRepository<T> implements Repository<T> {
             session.beginTransaction();
             session.remove(item);
             session.getTransaction().commit();
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
         }
     }
 
@@ -53,8 +51,6 @@ public class AbstractRepository<T> implements Repository<T> {
             session.beginTransaction();
             updateItem = session.merge(item);
             session.getTransaction().commit();
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
         }
         return Optional.ofNullable(updateItem);
     }

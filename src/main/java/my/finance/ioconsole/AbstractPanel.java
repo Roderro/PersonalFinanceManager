@@ -1,6 +1,6 @@
 package my.finance.ioconsole;
 
-import my.finance.ioconsole.management.category.ViewCategoryPanel;
+import my.finance.ioconsole.main.management.category.ViewCategoryPanel;
 import my.finance.repository.*;
 import my.finance.security.AppSession;
 import my.finance.transport.Input;
@@ -38,12 +38,6 @@ public abstract class AbstractPanel implements Panel {
     protected final AppTransactionRepository appTransactionRepository = new AppTransactionRepository();
 
 
-    public static void main(String[] args) {
-        Panel panel = new ViewCategoryPanel(null);
-
-    }
-
-
     public AbstractPanel(AppSession appSession) {
         this.appSession = appSession;
         this.parentClass = this.nextPanelClass = getClassParentPanel();
@@ -55,12 +49,13 @@ public abstract class AbstractPanel implements Panel {
         if (checkAuthorizedUser()) {
             String login = appSession.getUser().getLogin();
             double balance = walletRepository.calculateBalance(appSession.getWallet().getId());
+            appSession.getWallet().setBalance(balance);
+            walletRepository.update(appSession.getWallet());
             info = String.format("Логин: %s Баланс: %.2f", login, balance);
         }
-        String lineString = "-".repeat(info.length());
-        output.println(lineString);
+        output.printLine(info.length());
         output.println(info);
-        output.println(lineString);
+        output.printLine(info.length());
     }
 
     public void printPanel() {
@@ -92,7 +87,7 @@ public abstract class AbstractPanel implements Panel {
     }
 
 
-    private final Class<? extends Panel> getClassParentPanel() {
+    protected Class<? extends Panel> getClassParentPanel() {
         Class<? extends Panel> targetClass = null;
         try {
             Class<?> currentClass = this.getClass();
