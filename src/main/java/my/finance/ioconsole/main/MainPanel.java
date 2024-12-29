@@ -7,9 +7,7 @@ import my.finance.ioconsole.Panel;
 import my.finance.ioconsole.authentication.AuthenticationMainPanel;
 import my.finance.security.AppSession;
 
-import java.io.IOException;
 import java.util.InputMismatchException;
-import java.util.List;
 
 public class MainPanel extends AbstractMainPanel {
     static final String TEXT = "Главная страница";
