@@ -4,20 +4,24 @@ import my.finance.ioconsole.AbstractPanel;
 import my.finance.models.AppTransaction;
 import my.finance.security.AppSession;
 import org.hibernate.HibernateException;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
 import java.util.List;
 
+@Component
+@Lazy
 public class EditAppTransactionPanel extends AbstractPanel {
     static final String TEXT = "Изменить параметры транзакции";
 
-    public EditAppTransactionPanel(AppSession appSession) {
-        super(appSession);
+    public EditAppTransactionPanel() {
+        super();
     }
 
     @Override
     public void action() {
-        List<AppTransaction> userAppTransaction = appTransactionRepository.findAll(appSession.getUser().getWallet());
+        List<AppTransaction> userAppTransaction = appTransactionRepository.findAllByWallet(appSession.getUser().getWallet());
         output.fPrintAppTransaction(userAppTransaction);
         if (userAppTransaction.isEmpty()) {
             waitEnter();
@@ -33,7 +37,7 @@ public class EditAppTransactionPanel extends AbstractPanel {
             output.print("Введите новое описание: ");
             String newDescription = input.nextLine();
             appTransaction.setDescription(newDescription);
-            appTransactionRepository.update(appTransaction);
+            appTransactionRepository.save(appTransaction);
         } catch (InputMismatchException e) {
             output.println("Введено не число!");
         } catch (IndexOutOfBoundsException e) {

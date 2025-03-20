@@ -1,19 +1,13 @@
 package my.finance.ioconsole;
 
 
-/**
-* Класс PanelManager отвечает за управление жизненным циклом и взаимодействием различных пользовательских панелей посредством непрерывного цикла.
- * Отображение пользовательской информации, рендеринг содержимого панели и выполнения действия панели.
- */
-public class PanelManager {
-    private Panel panel;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PanelManager implements Manager {
 
 
-    public PanelManager(Panel panel) {
-        this.panel = panel;
-    }
-
-    public void manage() {
+    public void manage(Panel panel) {
         while (true) {
             panel.printLoginAndBalance();
             panel.printPanel();

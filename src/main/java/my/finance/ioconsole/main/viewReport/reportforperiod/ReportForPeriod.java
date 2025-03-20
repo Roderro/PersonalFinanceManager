@@ -2,17 +2,21 @@ package my.finance.ioconsole.main.viewReport.reportforperiod;
 
 import my.finance.utils.DatePeriodHelper;
 import my.finance.security.AppSession;
-import my.finance.transport.StandardOutput;
+import my.finance.transport.ConsoleOutput;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 
+@Component
+@Lazy
 public class ReportForPeriod extends AbstractReportForPeriodPanel {
     static final String TEXT = "Отчет за определенный период";
 
-    public ReportForPeriod(AppSession appSession) {
-        super(appSession);
+    public ReportForPeriod() {
+        super();
     }
 
     @Override
@@ -31,13 +35,13 @@ public class ReportForPeriod extends AbstractReportForPeriodPanel {
         LocalDate startDate = null;
         LocalDate endDate = null;
         try {
-            output.printf("Введите начальную дату и время в формате %s:", StandardOutput.DATE_PATTERN);
+            output.printf("Введите начальную дату и время в формате %s:", ConsoleOutput.DATE_PATTERN);
             String startInput = input.nextLine();
-            startDate = LocalDate.parse(startInput, StandardOutput.dateFormat);
-            output.printf("Введите конечную дату и время в формате %s:", StandardOutput.DATE_PATTERN);
+            startDate = LocalDate.parse(startInput, ConsoleOutput.dateFormat);
+            output.printf("Введите конечную дату и время в формате %s:", ConsoleOutput.DATE_PATTERN);
             String endInput = input.nextLine();
 
-            endDate = LocalDate.parse(endInput, StandardOutput.dateFormat);
+            endDate = LocalDate.parse(endInput, ConsoleOutput.dateFormat);
             if (startDate.isAfter(endDate)) {
                 throw new InputMismatchException();
             }

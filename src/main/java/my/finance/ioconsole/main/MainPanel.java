@@ -6,19 +6,16 @@ import my.finance.ioconsole.close.CloseApplicationPanel;
 import my.finance.ioconsole.Panel;
 import my.finance.ioconsole.authentication.AuthenticationMainPanel;
 import my.finance.security.AppSession;
+import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
 
+@Component
 public class MainPanel extends AbstractMainPanel {
     static final String TEXT = "Главная страница";
 
-    public MainPanel(AppSession appSession) {
-        super(appSession);
-    }
-
-    public static void main(String[] args) {
-        MainPanel mainPanel =new MainPanel(null);
-        System.out.println(mainPanel.children);
+    public MainPanel() {
+        super();
     }
 
     @Override
@@ -35,7 +32,7 @@ public class MainPanel extends AbstractMainPanel {
     @Override
     protected Class<? extends Panel> getSpecialPanel(int inputNumber) {
         if (inputNumber == children.size() + 1) {
-            appSession = null;
+            appSession.logout();
             return AuthenticationMainPanel.class;
         } else if (inputNumber == children.size() + 2) {
             return CloseApplicationPanel.class;

@@ -4,16 +4,19 @@ import my.finance.ioconsole.AbstractPanel;
 import my.finance.security.AppSession;
 import my.finance.security.Authentication;
 import my.finance.security.StandartAuthentication;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-
+@Component
+@Lazy
 public class EditPasswordPanel extends AbstractPanel {
     static final String TEXT = "Изменить пароль";
     private final Authentication authentication;
 
 
-    public EditPasswordPanel(AppSession appSession) {
-        super(appSession);
-        this.authentication = new StandartAuthentication(userRepository);
+    public EditPasswordPanel(Authentication authentication) {
+        super();
+        this.authentication = authentication;
     }
 
     @Override
@@ -26,7 +29,7 @@ public class EditPasswordPanel extends AbstractPanel {
                 output.print("Введите новый пароль: ");
                 String newPasswordHash = authentication.getHashFunc().hash(input.nextLine());
                 appSession.getUser().setPassword(newPasswordHash);
-                userRepository.update(appSession.getUser());
+                userRepository.save(appSession.getUser());
                 output.println("Пароль изменен!");
             } catch (Exception e) {
                 appSession.getUser().setPassword(oldPasswordHash);

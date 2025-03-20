@@ -4,161 +4,81 @@ import my.finance.models.AppTransaction;
 import my.finance.models.User;
 import my.finance.models.Wallet;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-public class AppTransactionRepository extends AbstractRepository<AppTransaction> {
+@Component
+public interface AppTransactionRepository extends JpaRepository<AppTransaction, Integer> {
 
-    public AppTransactionRepository() {
-        super(AppTransaction.class);
+    List<AppTransaction> findAllByWallet(Wallet wallet);
+
+    List<AppTransaction> findAllByBudgetCategory_Id(int categoryID);
+
+    @Query("select coalesce(sum(ap.amount),0) from AppTransaction ap where ap.budgetCategory.id=:categoryId")
+    Double sumByCategory(@Param("categoryId") int categoryId);
+
+    @Query("SELECT ap.budgetCategory.categoryName, SUM(ap.amount)" +
+            "FROM AppTransaction ap " +
+            "WHERE ap.wallet.id = :walletId " +
+            "AND ap.budgetCategory.isIncome = true " +
+            "GROUP BY ap.budgetCategory.categoryName")
+    List<Object[]> selectIncomeAndAggregateAmount(@Param("walletId") int walletId);
+
+    public default List<Object[]> selectIncomeAndAggregateAmount(Wallet wallet) {
+        return selectIncomeAndAggregateAmount(wallet.getId());
     }
 
+    @Query("SELECT ap.budgetCategory.categoryName, SUM(ap.amount) , ap.budgetCategory.budgetLimit + SUM(ap.amount)" +
+            "FROM AppTransaction ap " +
+            "WHERE ap.wallet.id = :walletId " +
+            "AND ap.budgetCategory.isIncome = false " +
+            "GROUP BY ap.budgetCategory.categoryName, ap.budgetCategory.budgetLimit")
+    List<Object[]> selectExpensesAndCalRemainder(@Param("walletId") int walletId);
 
-    public List<AppTransaction> findAll(User user) {
-        return findAll(user.getWallet());
+    public default List<Object[]> selectExpensesAndCalRemainder(Wallet wallet) {
+        return selectExpensesAndCalRemainder(wallet.getId());
     }
 
-    public List<AppTransaction> findAll(Wallet wallet) {
-        List<AppTransaction> resultList;
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query<AppTransaction> query = session.createQuery("FROM AppTransaction ap " +
-                    "WHERE ap.wallet.id = :walletId", AppTransaction.class);
-            query.setParameter("walletId", wallet.getId());
-            resultList = query.list();
-            session.getTransaction().commit();
-        }
-        return resultList;
-    }
+    @Query("SELECT SUM(ap.amount) " +
+            "FROM AppTransaction ap " +
+            "WHERE ap.wallet.id = :walletId " +
+            "AND ap.budgetCategory.isIncome = :isIncome")
+    Double sumByTypedCategories(@Param("walletId") int walletId, boolean isIncome);
 
-    public Double sumByCategory(int categoryID) {
-        double result;
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query<Double> query = session.createQuery(
-                    "SELECT SUM(ap.amount) " +
-                            "FROM AppTransaction ap " +
-                            "WHERE ap.budgetCategory.id = :categoryID", Double.class);
-            query.setParameter("categoryID", categoryID);
-            result = query.getSingleResult();
-            session.getTransaction().commit();
-        } catch (NullPointerException e) {
-            result = 0.;
-        }
-        return result;
-    }
-
-
-    public List<Object[]> selectIncomeAndAggregateAmount(Wallet wallet) {
-        List<Object[]> resultList;
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query<Object[]> query = session.createQuery("SELECT ap.budgetCategory.categoryName, SUM(ap.amount)" +
-                    "FROM AppTransaction ap " +
-                    "WHERE ap.wallet.id = :walletId " +
-                    "AND ap.budgetCategory.isIncome = true " +
-                    "GROUP BY ap.budgetCategory.categoryName", Object[].class);
-            query.setParameter("walletId", wallet.getId());
-            resultList = query.getResultList();
-            session.getTransaction().commit();
-        }
-        return resultList;
-    }
-
-
-    public List<Object[]> selectExpensesAndCalRemainder(Wallet wallet) {
-        List<Object[]> resultList;
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query<Object[]> query = session.createQuery(
-                    "SELECT ap.budgetCategory.categoryName, SUM(ap.amount) , ap.budgetCategory.budgetLimit + SUM(ap.amount)" +
-                            "FROM AppTransaction ap " +
-                            "WHERE ap.wallet.id = :walletId " +
-                            "AND ap.budgetCategory.isIncome = false " +
-                            "GROUP BY ap.budgetCategory.categoryName, ap.budgetCategory.budgetLimit", Object[].class);
-            query.setParameter("walletId", wallet.getId());
-            resultList = query.getResultList();
-            session.getTransaction().commit();
-        }
-        return resultList;
-    }
-
-
-    public Double sumByTypedCategories(User user, boolean isIncome) {
+    public default Double sumByTypedCategories(User user, boolean isIncome) {
         return sumByTypedCategories(user.getWallet(), isIncome);
     }
 
-    public Double sumByTypedCategories(Wallet wallet, boolean isIncome) {
-        Double result;
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query<Double> query = session.createQuery(
-                    "SELECT SUM(ap.amount) " +
-                            "FROM AppTransaction ap " +
-                            "WHERE ap.wallet.id = :walletId " +
-                            "AND ap.budgetCategory.isIncome = :isIncome", Double.class);
-            query.setParameter("walletId", wallet.getId());
-            query.setParameter("isIncome", isIncome);
-            result = query.getSingleResult();
-            session.getTransaction().commit();
-        }
-        return result == null ? 0. : result;
+    public default Double sumByTypedCategories(Wallet wallet, boolean isIncome) {
+        return sumByTypedCategories(wallet.getId(), isIncome);
     }
 
-    public Double sumByTypedCategoriesForPeriod(Wallet wallet, boolean isIncome, LocalDate startDate, LocalDate endDate) {
-        Double result;
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query<Double> query = session.createQuery(
-                    "SELECT SUM(ap.amount) " +
-                            "FROM AppTransaction ap " +
-                            "WHERE ap.wallet.id = :walletId " +
-                            "AND ap.budgetCategory.isIncome = :isIncome " +
-                            "AND ap.updatedAt >= :startDate " +
-                            "AND ap.updatedAt <= :endDate", Double.class);
-            query.setParameter("walletId", wallet.getId());
-            query.setParameter("isIncome", isIncome);
-            query.setParameter("startDate", startDate.atStartOfDay());
-            query.setParameter("endDate", endDate.atTime(LocalTime.MAX));
-            result = query.getSingleResult();
-            session.getTransaction().commit();
-        }
-        return result == null ? 0.0 : result;
+    @Query("SELECT SUM(ap.amount) " +
+            "FROM AppTransaction ap " +
+            "WHERE ap.wallet.id = :walletId " +
+            "AND ap.budgetCategory.isIncome = :isIncome " +
+            "AND ap.updatedAt >= :startDate " +
+            "AND ap.updatedAt <= :endDate")
+    Double sumByTypedCategoriesForPeriod(int walletId, boolean isIncome, LocalDateTime startDate, LocalDateTime endDate);
+
+    public default Double sumByTypedCategoriesForPeriod(Wallet wallet, boolean isIncome, LocalDate startDate, LocalDate endDate) {
+        return sumByTypedCategoriesForPeriod(wallet.getId(), isIncome, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
     }
 
-    public List<AppTransaction> getAllForPeriod(Wallet wallet, LocalDate startDate, LocalDate endDate) {
-        List<AppTransaction> result;
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query<AppTransaction> query = session.createQuery(
-                    "FROM AppTransaction ap " +
-                            "WHERE ap.wallet.id = :walletId " +
-                            "AND ap.updatedAt >= :startDate " +
-                            "AND ap.updatedAt <= :endDate", AppTransaction.class);
-            query.setParameter("walletId", wallet.getId());
-            query.setParameter("startDate", startDate.atStartOfDay());
-            query.setParameter("endDate", endDate.atTime(LocalTime.MAX));
-            result = query.getResultList();
-            session.getTransaction().commit();
-        }
-        return result;
-    }
+    @Query("FROM AppTransaction ap " +
+            "WHERE ap.wallet.id = :walletId " +
+            "AND ap.updatedAt >= :startDate " +
+            "AND ap.updatedAt <= :endDate")
+    List<AppTransaction> getAllForPeriod(int walletId, LocalDateTime startDate, LocalDateTime endDate);
 
-
-    public List<AppTransaction> getByCategory(int categoryID) {
-        List<AppTransaction> result;
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query<AppTransaction> query = session.createQuery(
-                    "FROM AppTransaction ap " +
-                            "WHERE ap.budgetCategory.id = :categoryID", AppTransaction.class);
-            query.setParameter("categoryID", categoryID);
-            result = query.list();
-            session.getTransaction().commit();
-            return result;
-        }
+    public default List<AppTransaction> getAllForPeriod(Wallet wallet, LocalDate startDate, LocalDate endDate) {
+        return getAllForPeriod(wallet.getId(), startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
     }
 }

@@ -1,9 +1,12 @@
 package my.finance.security;
 
+import org.springframework.stereotype.Component;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+@Component
 public class SHA256HashFunc implements HashFunc{
 
 

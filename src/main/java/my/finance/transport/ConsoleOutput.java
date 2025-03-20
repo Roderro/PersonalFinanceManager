@@ -2,6 +2,7 @@ package my.finance.transport;
 
 import my.finance.models.AppTransaction;
 import my.finance.models.BudgetCategory;
+import org.springframework.stereotype.Component;
 
 import java.io.PrintStream;
 import java.time.LocalDate;
@@ -9,13 +10,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class StandardOutput implements Output {
+@Component
+public class ConsoleOutput implements Output {
     private final PrintStream output;
     private final PrintStream error;
     public static final String DATE_PATTERN = "dd-MM-yyyy";
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(DATE_PATTERN);
 
-    public StandardOutput() {
+    public ConsoleOutput() {
         output = System.out;
         error = System.err;
     }
@@ -50,7 +52,7 @@ public class StandardOutput implements Output {
         output.flush();
     }
 
-    public void printLine(int size){
+    public void printLine(int size) {
         String lineString = "-".repeat(size);
         output.println(lineString);
     }
@@ -62,18 +64,17 @@ public class StandardOutput implements Output {
             output.println("Категорий дохода пока что нет, но их можно добавить!");
         } else {
             output.println("Категории дохода:");
-            output.println(ListCategoriesTofString(incomeCategories, 0, true));
+            fPrintListCategories(incomeCategories, 0, true);
         }
-
         if (expenseCategories.isEmpty()) {
             output.println("Категорий расхода пока что нет, но их можно добавить!");
         } else {
             output.println("Категории расхода:");
-            output.println(ListCategoriesTofString(expenseCategories, incomeCategories.size(), false));
+            fPrintListCategories(expenseCategories, incomeCategories.size(), false);
         }
     }
 
-    public String ListCategoriesTofString(List<BudgetCategory> userCategories, int offset, boolean isIncome) {
+    public void fPrintListCategories(List<BudgetCategory> userCategories, int offset, boolean isIncome) {
         String resultString;
         if (isIncome) {
             resultString = userCategories.stream()
@@ -86,8 +87,9 @@ public class StandardOutput implements Output {
                             category.getCategoryName(), category.getBudgetLimit()))
                     .collect(Collectors.joining("\n"));
         }
-        return resultString;
+        output.println(resultString);
     }
+
 
     public void fPrintAppTransaction(List<AppTransaction> appTransactions) {
         if (appTransactions.isEmpty()) {

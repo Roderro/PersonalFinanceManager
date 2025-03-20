@@ -7,19 +7,17 @@ import my.finance.models.User;
 import my.finance.security.AppSession;
 import my.finance.security.Authentication;
 import my.finance.security.StandartAuthentication;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RegistrationPanel extends AbstractPanel {
     static final String TEXT = "Регистрация";
 
     private final Authentication authentication;
 
-    public RegistrationPanel(AppSession appSession) {
-        super(appSession);
-        this.authentication = new StandartAuthentication(userRepository);
-    }
-
-    public RegistrationPanel(AppSession appSession, Authentication authentication) {
-        super(appSession);
+    public RegistrationPanel(Authentication authentication) {
+        super();
         this.authentication = authentication;
     }
 
@@ -33,8 +31,8 @@ public class RegistrationPanel extends AbstractPanel {
         String hashNewPassword = authentication.getHashFunc().hash(newPassword);
         User newUser = new User(newLogin, hashNewPassword);
         try {
-            userRepository.add(newUser);
-            appSession = new AppSession(newUser);
+            userRepository.save(newUser);
+            appSession.setUser(newUser);
             nextPanelClass = MainPanel.class;
         } catch (PersistenceException e) {
             output.println("Логин уже существует!");

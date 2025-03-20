@@ -1,11 +1,14 @@
 package my.finance.transport;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Scanner;
 
-public class StandardInput implements Input {
+@Component
+public class ConsoleInput implements Input {
     private final Scanner scanner;
 
-    public StandardInput() {
+    public ConsoleInput() {
         scanner = new Scanner(System.in);
     }
 

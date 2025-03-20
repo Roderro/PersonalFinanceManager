@@ -1,6 +1,5 @@
 package my.finance.repository;
 
-import my.finance.utils.HibernateUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -9,10 +8,11 @@ import java.util.Optional;
 
 public class AbstractRepository<T> implements Repository<T> {
     private final Class<T> clazz;
-    protected static final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+    protected final SessionFactory sessionFactory;
 
-    public AbstractRepository(Class<T> clazz) {
+    public AbstractRepository(Class<T> clazz, SessionFactory sessionFactory) {
         this.clazz = clazz;
+        this.sessionFactory = sessionFactory;
     }
 
     @Override

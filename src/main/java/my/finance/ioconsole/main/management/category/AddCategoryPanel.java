@@ -1,18 +1,20 @@
 package my.finance.ioconsole.main.management.category;
 
-import jakarta.persistence.PersistenceException;
 import my.finance.ioconsole.AbstractPanel;
 import my.finance.models.BudgetCategory;
-import my.finance.security.AppSession;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
 
+@Component
+@Lazy
 public class AddCategoryPanel extends AbstractPanel {
     static final String TEXT = "Добавление категории";
 
 
-    public AddCategoryPanel(AppSession appSession) {
-        super(appSession);
+    public AddCategoryPanel() {
+        super();
     }
 
 
@@ -27,7 +29,7 @@ public class AddCategoryPanel extends AbstractPanel {
     }
 
 
-    protected boolean getTypeCategory() throws RuntimeException {
+     public boolean getTypeCategory() throws RuntimeException {
         output.print("""
                 Выберите тип:
                 1. Доход
@@ -43,7 +45,7 @@ public class AddCategoryPanel extends AbstractPanel {
         return inputInt != 2;
     }
 
-    protected BudgetCategory createCategory(boolean isIncome) throws RuntimeException {
+    public BudgetCategory createCategory(boolean isIncome) throws RuntimeException {
         String type = isIncome ? "дохода" : "расхода";
         output.printf("Введите название категории %s: ", type);
         String nameCategory = input.next();
@@ -57,8 +59,8 @@ public class AddCategoryPanel extends AbstractPanel {
                 if (limit < 0) throw new IllegalArgumentException();
                 budgetCategory = new BudgetCategory(appSession.getUser().getWallet(), nameCategory, limit);
             }
-            budgetCategoryRepository.add(budgetCategory);
-            output.println(STR."Категория \{budgetCategory.getCategoryName()} создана!");
+            budgetCategoryRepository.save(budgetCategory);
+            output.println("Категория %s создана!".formatted(budgetCategory.getCategoryName()));
             return budgetCategory;
 
         } catch (IllegalArgumentException e) {

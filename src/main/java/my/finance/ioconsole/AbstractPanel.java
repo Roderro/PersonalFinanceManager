@@ -1,12 +1,16 @@
 package my.finance.ioconsole;
 
-import my.finance.ioconsole.main.management.category.ViewCategoryPanel;
+import jakarta.annotation.PostConstruct;
+import lombok.Setter;
 import my.finance.repository.*;
 import my.finance.security.AppSession;
 import my.finance.transport.Input;
 
-import my.finance.transport.StandardInput;
-import my.finance.transport.StandardOutput;
+import my.finance.transport.Output;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,27 +26,46 @@ import java.util.List;
  * Абстрактный базовый класс для определения пользовательских панелей в приложении.
  * Предоставляет общие методы и свойства для обработки взаимодействия с пользователем.
  */
-
+@Setter
 public abstract class AbstractPanel implements Panel {
     //Для корректного создания дочерних панелей в AbstractMainPanel,
     // при создании AbstractPanel необходимо переопределить TEXT
     private static final String TEXT = "Some panel text";
+    @Autowired
     protected AppSession appSession;
     protected Class<? extends Panel> parentClass;
     protected Class<? extends Panel> nextPanelClass;
-    protected final Input input = new StandardInput();
-    protected final StandardOutput output = new StandardOutput();
-    protected final UserRepository userRepository = new UserRepository();
-    protected final WalletRepository walletRepository = new WalletRepository();
-    protected final BudgetCategoryRepository budgetCategoryRepository = new BudgetCategoryRepository();
-    protected final AppTransactionRepository appTransactionRepository = new AppTransactionRepository();
+    @Autowired
+    protected Input input;
+    @Autowired
+    protected Output output;
+    @Autowired
+    protected UserRepository userRepository;
+    @Autowired
+    protected WalletRepository walletRepository;
+    @Autowired
+    protected BudgetCategoryRepository budgetCategoryRepository;
+    @Autowired
+    protected AppTransactionRepository appTransactionRepository;
+    @Autowired
+    private ApplicationContext applicationContext;
 
 
-    public AbstractPanel(AppSession appSession) {
-        this.appSession = appSession;
+//    public AbstractPanel(AppSession appSession, Input input, Output output, UserRepository userRepository, WalletRepository walletRepository, BudgetCategoryRepository budgetCategoryRepository, AppTransactionRepository appTransactionRepository) {
+//        this.appSession = appSession;
+//        this.input = input;
+//        this.output = output;
+//        this.userRepository = userRepository;
+//        this.walletRepository = walletRepository;
+//        this.budgetCategoryRepository = budgetCategoryRepository;
+//        this.appTransactionRepository = appTransactionRepository;
+//        this.parentClass = this.nextPanelClass = getClassParentPanel();
+//    }
+
+    @PostConstruct
+    public void init() {
         this.parentClass = this.nextPanelClass = getClassParentPanel();
     }
-
 
     public void printLoginAndBalance() {
         String info = "Не авторизован";
@@ -50,7 +73,7 @@ public abstract class AbstractPanel implements Panel {
             String login = appSession.getUser().getLogin();
             double balance = walletRepository.calculateBalance(appSession.getWallet().getId());
             appSession.getWallet().setBalance(balance);
-            walletRepository.update(appSession.getWallet());
+            walletRepository.save(appSession.getWallet());
             info = String.format("Логин: %s Баланс: %.2f", login, balance);
         }
         output.printLine(info.length());
@@ -65,25 +88,12 @@ public abstract class AbstractPanel implements Panel {
 
 
     public final boolean checkAuthorizedUser() {
-        return appSession != null;
+        return appSession.getUser() != null;
     }
 
     public final Panel nextPanel() {
-        Panel panel = null;
-        try {
-            Class<? extends Panel> nextClass = nextPanelClass;
-            Constructor<?> parameterizedConstructor = nextClass.getConstructor(AppSession.class);
-            panel = (Panel) parameterizedConstructor.newInstance(appSession);
-        } catch (NoSuchMethodException e) {
-            output.error("Конструктор не найден: " + e.getMessage());
-        } catch (InstantiationException e) {
-            output.error("Ошибка создания экземпляра: " + e.getMessage());
-        } catch (IllegalAccessException e) {
-            output.error("Ошибка доступа: " + e.getMessage());
-        } catch (InvocationTargetException e) {
-            output.error("Ошибка в вызываемом конструкторе: " + e.getMessage());
-        }
-        return panel;
+        Class<? extends Panel> nextClass = nextPanelClass;
+        return applicationContext.getBean(nextClass);
     }
 
 
@@ -172,7 +182,6 @@ public abstract class AbstractPanel implements Panel {
         }
         return classes;
     }
-
 
     public void waitEnter() {
         output.print("Нажмите Enter, чтобы продолжить> ");

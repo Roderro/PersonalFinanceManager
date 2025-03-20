@@ -5,20 +5,17 @@ import my.finance.ioconsole.main.MainPanel;
 import my.finance.security.AppSession;
 import my.finance.security.Authentication;
 import my.finance.security.StandartAuthentication;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-
+@Component
 public class LoginPanel extends AbstractPanel {
     static final String TEXT = "Вход";
     private final Authentication authentication;
 
-    public LoginPanel(AppSession appSession) {
-        super(appSession);
-        this.authentication = new StandartAuthentication(userRepository);
-    }
-
-    public LoginPanel(AppSession appSession, Authentication authentication) {
-        super(appSession);
+    public LoginPanel(Authentication authentication) {
+        super();
         this.authentication = authentication;
     }
 

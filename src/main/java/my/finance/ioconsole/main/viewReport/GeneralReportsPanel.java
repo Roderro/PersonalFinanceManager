@@ -2,15 +2,19 @@ package my.finance.ioconsole.main.viewReport;
 
 import my.finance.ioconsole.AbstractPanel;
 import my.finance.security.AppSession;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
+@Lazy
 public class GeneralReportsPanel extends AbstractPanel {
     static final String TEXT = "Общий отчет";
 
-    public GeneralReportsPanel(AppSession appSession) {
-        super(appSession);
+    public GeneralReportsPanel() {
+        super();
     }
 
 

@@ -1,19 +1,24 @@
 package my.finance.ioconsole.main.management.category;
 
+import my.finance.ioconsole.AbstractMainPanel;
+import my.finance.ioconsole.AbstractPanel;
 import my.finance.models.BudgetCategory;
-import my.finance.security.AppSession;
 import org.hibernate.HibernateException;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class DeleteCategoryPanel extends ViewCategoryPanel {
+@Component
+@Lazy
+public class DeleteCategoryPanel extends AbstractPanel {
     static final String TEXT = "Удаление категории";
 
 
-    public DeleteCategoryPanel(AppSession appSession) {
-        super(appSession);
+    public DeleteCategoryPanel() {
+        super();
     }
 
 
@@ -39,7 +44,7 @@ public class DeleteCategoryPanel extends ViewCategoryPanel {
             String decision = input.next();
             if (decision.equals("д") || decision.equals("да") || decision.equals("y") || decision.equals("yes")) {
                 budgetCategoryRepository.delete(delCategory);
-                output.println(STR."Категория \{delCategory.getCategoryName()} удалена");
+                output.println("Категория %s удалена".formatted(delCategory.getCategoryName()));
             } else return;
         } catch (InputMismatchException e) {
             output.println("Введено не число!");

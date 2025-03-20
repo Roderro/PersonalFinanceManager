@@ -1,19 +1,25 @@
 package my.finance.ioconsole.main.management.category;
 
+import my.finance.ioconsole.AbstractMainPanel;
+import my.finance.ioconsole.AbstractPanel;
 import my.finance.models.BudgetCategory;
 import my.finance.security.AppSession;
 import org.hibernate.HibernateException;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class EditCategoryPanel extends ViewCategoryPanel {
+@Component
+@Lazy
+public class EditCategoryPanel extends AbstractPanel {
     static final String TEXT = "Редактирование существующей категории";
 
 
-    public EditCategoryPanel(AppSession appSession) {
-        super(appSession);
+    public EditCategoryPanel( ) {
+        super();
     }
 
     @Override
@@ -43,7 +49,7 @@ public class EditCategoryPanel extends ViewCategoryPanel {
                 if (newLimit < 0) throw new IllegalArgumentException();
                 category.setBudgetLimit(newLimit);
             }
-            budgetCategoryRepository.update(category);
+            budgetCategoryRepository.save(category);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Лимит должен быть положительным!");
         } catch (InputMismatchException e) {

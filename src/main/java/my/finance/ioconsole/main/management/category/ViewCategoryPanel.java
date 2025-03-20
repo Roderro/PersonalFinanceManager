@@ -3,17 +3,23 @@ package my.finance.ioconsole.main.management.category;
 import my.finance.ioconsole.AbstractPanel;
 import my.finance.models.BudgetCategory;
 import my.finance.security.AppSession;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
+@Lazy
 public class ViewCategoryPanel extends AbstractPanel {
     static final String TEXT = "Просмотр списка категорий";
 
 
     protected List<BudgetCategory> userCategories;
 
-    public ViewCategoryPanel(AppSession appSession) {
-        super(appSession);
+    public ViewCategoryPanel() {
+        super();
 
     }
 

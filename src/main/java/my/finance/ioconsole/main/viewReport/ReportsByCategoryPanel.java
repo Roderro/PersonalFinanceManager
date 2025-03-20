@@ -4,16 +4,20 @@ import my.finance.ioconsole.AbstractPanel;
 import my.finance.models.BudgetCategory;
 import my.finance.security.AppSession;
 import org.hibernate.HibernateException;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Component
+@Lazy
 public class ReportsByCategoryPanel extends AbstractPanel {
     static final String TEXT = "Отчет по категориям";
 
-    public ReportsByCategoryPanel(AppSession appSession) {
-        super(appSession);
+    public ReportsByCategoryPanel() {
+        super();
     }
 
     @Override
@@ -40,7 +44,7 @@ public class ReportsByCategoryPanel extends AbstractPanel {
                 output.printf("Общий расход по категории: %s, остаток по лимиту:%.2f %n", summaTransactions,
                         (category.getBudgetLimit() + summaTransactions));
             }
-            output.fPrintAppTransaction(appTransactionRepository.getByCategory(category.getId()));
+            output.fPrintAppTransaction(appTransactionRepository.findAllByBudgetCategory_Id(category.getId()));
             waitEnter();
         } catch (InputMismatchException e) {
             output.println("Введено не число!");

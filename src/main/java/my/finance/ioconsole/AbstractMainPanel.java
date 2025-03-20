@@ -1,7 +1,7 @@
 package my.finance.ioconsole;
 
+import jakarta.annotation.PostConstruct;
 import my.finance.ioconsole.close.CloseApplicationPanel;
-import my.finance.security.AppSession;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,9 +12,20 @@ import java.util.*;
 public abstract class AbstractMainPanel extends AbstractPanel {
     protected List<Class<?>> children = new ArrayList<>();
 
-    public AbstractMainPanel(AppSession appSession) {
-        super(appSession);
+    public AbstractMainPanel() {
+        super();
     }
+
+    @PostConstruct
+    public void init() {
+        try {
+            super.init();
+            populateChildren();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public List<Class<?>> getChildren() {
         return children;
@@ -23,7 +34,6 @@ public abstract class AbstractMainPanel extends AbstractPanel {
     @Override
     public final void printPanel() {
         try {
-            populateChildren();
             printChildren();
             printSpecialPanel();
         } catch (Exception e) {
@@ -50,7 +60,7 @@ public abstract class AbstractMainPanel extends AbstractPanel {
     }
 
 
-    protected void populateChildren() throws IOException, ClassNotFoundException {
+    private void populateChildren() throws IOException, ClassNotFoundException {
         Class<?> currentClass = this.getClass();
         String packageName = currentClass.getPackage().getName();
         List<String> subPackages = getSubPackages(packageName);

@@ -2,14 +2,17 @@ package my.finance.ioconsole.main.setting;
 
 import jakarta.persistence.PersistenceException;
 import my.finance.ioconsole.AbstractPanel;
-import my.finance.security.AppSession;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
+@Component
+@Lazy
 public class EditLoginPanel extends AbstractPanel {
     static final String TEXT = "Изменить логин";
 
 
-    public EditLoginPanel(AppSession appSession) {
-        super(appSession);
+    public EditLoginPanel() {
+        super();
     }
 
     @Override
@@ -19,7 +22,7 @@ public class EditLoginPanel extends AbstractPanel {
         try {
             String newLogin = input.next();
             appSession.getUser().setLogin(newLogin);
-            userRepository.update(appSession.getUser());
+            userRepository.save(appSession.getUser());
             output.println("Логин изменен!");
         } catch (PersistenceException e) {
             output.println("Логин уже существует!");

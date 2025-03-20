@@ -2,13 +2,14 @@ package my.finance.ioconsole.close;
 
 import my.finance.ioconsole.AbstractPanel;
 import my.finance.ioconsole.Panel;
-import my.finance.ioconsole.authentication.AuthenticationMainPanel;
-import my.finance.security.AppSession;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CloseApplicationPanel extends AbstractPanel {
 
-    public CloseApplicationPanel(AppSession appSession) {
-        super(appSession);
+    public CloseApplicationPanel() {
+        super();
     }
 
     @Override
@@ -22,7 +23,7 @@ public class CloseApplicationPanel extends AbstractPanel {
 
     @Override
     public void printPanel() {
-        System.out.println("До скорых встреч");
+        output.println("До скорых встреч");
     }
 
 

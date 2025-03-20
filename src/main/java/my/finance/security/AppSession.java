@@ -1,8 +1,16 @@
 package my.finance.security;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import my.finance.models.User;
 import my.finance.models.Wallet;
+import org.springframework.stereotype.Component;
 
+@Setter
+@Getter
+@Component
+@NoArgsConstructor
 public class AppSession {
     User user;
 
@@ -10,15 +18,10 @@ public class AppSession {
         this.user = user;
     }
 
-    public User getUser() {
-        return user;
-    }
+    public void logout(){this.user = null;}
 
     public Wallet getWallet(){
         return user.getWallet();
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

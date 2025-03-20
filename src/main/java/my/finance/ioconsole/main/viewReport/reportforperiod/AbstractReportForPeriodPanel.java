@@ -7,13 +7,13 @@ import my.finance.security.AppSession;
 import java.time.LocalDate;
 import java.util.List;
 
+
 public class AbstractReportForPeriodPanel extends AbstractPanel {
 
     protected LocalDate[] period;
 
-    public AbstractReportForPeriodPanel(AppSession appSession) {
-        super(appSession);
-
+    public AbstractReportForPeriodPanel() {
+        super();
     }
 
     @Override
