@@ -2,6 +2,7 @@ package my.finance.models;
 
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "Wallets")
+@Data
 public class Wallet {
 
     @Id
@@ -49,80 +51,5 @@ public class Wallet {
         this.owner = owner;
         this.appTransactions = new ArrayList<>();
         this.budgetCategories = new ArrayList<>();
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<AppTransaction> getAppTransactions() {
-        return appTransactions;
-    }
-
-    public void setAppTransactions(List<AppTransaction> appTransactions) {
-        this.appTransactions = appTransactions;
-    }
-
-    public List<BudgetCategory> getBudgetCategories() {
-        return budgetCategories;
-    }
-
-    public void setBudgetCategories(List<BudgetCategory> budgetCategories) {
-        this.budgetCategories = budgetCategories;
-    }
-
-    public void addTransaction(AppTransaction appTransaction) {
-        if (appTransactions != null) {
-            appTransaction.setWallet(this);
-            appTransactions.add(appTransaction);
-            if (appTransaction.isIncome()) {
-                balance += appTransaction.getAmount();
-            } else {
-                balance -= appTransaction.getAmount();
-            }
-        }
-    }
-
-    public void addBudgetCategory(BudgetCategory budgetCategory) {
-        if (budgetCategories != null) {
-            budgetCategory.setWallet(this);
-            budgetCategories.add(budgetCategory);
-        }
     }
 }

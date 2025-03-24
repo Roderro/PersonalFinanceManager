@@ -1,6 +1,8 @@
 package my.finance.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -9,6 +11,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "budget_categories")
+@Data
+@NoArgsConstructor
 public class BudgetCategory {
 
     @Id
@@ -42,10 +46,6 @@ public class BudgetCategory {
     private LocalDateTime updatedAt;
 
 
-    public BudgetCategory() {
-    }
-
-
     //конструктор категорий доходов
     public BudgetCategory(Wallet wallet, String categoryName) {
         this.wallet = wallet;
@@ -53,77 +53,11 @@ public class BudgetCategory {
         this.isIncome = true;
     }
 
-
     //конструктор категорий расходов
     public BudgetCategory(Wallet wallet, String categoryName, double budgetLimit) {
         this.wallet = wallet;
         this.categoryName = categoryName;
         this.budgetLimit = budgetLimit;
         this.isIncome = false;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Wallet getWallet() {
-        return wallet;
-    }
-
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public double getBudgetLimit() {
-        return budgetLimit;
-    }
-
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public boolean isIncome() {
-        return isIncome;
-    }
-
-    public void setIncome(boolean income) {
-        isIncome = income;
-    }
-
-    public List<AppTransaction> getTransactions() {
-        return appTransactions;
-    }
-
-    public void setTransactions(List<AppTransaction> appTransactions) {
-        this.appTransactions = appTransactions;
-    }
-
-    public void setBudgetLimit(double budgetLimit) {
-        this.budgetLimit = budgetLimit;
     }
 }

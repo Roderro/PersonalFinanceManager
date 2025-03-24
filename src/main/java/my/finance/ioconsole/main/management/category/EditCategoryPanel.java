@@ -1,37 +1,32 @@
 package my.finance.ioconsole.main.management.category;
 
-import my.finance.ioconsole.AbstractMainPanel;
 import my.finance.ioconsole.AbstractPanel;
 import my.finance.models.BudgetCategory;
-import my.finance.security.AppSession;
-import org.hibernate.HibernateException;
+import my.finance.service.budgetCategory.BudgetCategoryService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 @Lazy
+@Profile("console")
 public class EditCategoryPanel extends AbstractPanel {
     static final String TEXT = "Редактирование существующей категории";
+    private final BudgetCategoryService budgetCategoryService;
+    private final ViewCategoryPanel viewCategoryPanel;
 
-
-    public EditCategoryPanel( ) {
+    public EditCategoryPanel(BudgetCategoryService budgetCategoryService, ViewCategoryPanel viewCategoryPanel) {
         super();
+        this.budgetCategoryService = budgetCategoryService;
+        this.viewCategoryPanel = viewCategoryPanel;
     }
 
     @Override
     public void action() {
-        List<BudgetCategory> incomeCategories = budgetCategoryRepository
-                .findAllUserTypedCategories(appSession.getUser(), true);
-        List<BudgetCategory> expenseCategories = budgetCategoryRepository
-                .findAllUserTypedCategories(appSession.getUser(), false);
-        output.fPrintCategories(incomeCategories, expenseCategories);
-        List<BudgetCategory> userCategories = Stream
-                .concat(incomeCategories.stream(), expenseCategories.stream())
-                .toList();
+        List<BudgetCategory> userCategories = viewCategoryPanel.fPrintCategoriesAndReturnConcatCategory();
         if (userCategories.isEmpty()) {
             waitEnter();
             return;
@@ -49,15 +44,15 @@ public class EditCategoryPanel extends AbstractPanel {
                 if (newLimit < 0) throw new IllegalArgumentException();
                 category.setBudgetLimit(newLimit);
             }
-            budgetCategoryRepository.save(category);
+            budgetCategoryService.save(category);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Лимит должен быть положительным!");
         } catch (InputMismatchException e) {
             output.println("Введено не число!");
         } catch (IndexOutOfBoundsException e) {
             output.println("Введено неправильное число!");
-        } catch (HibernateException e) {
-            output.println("Ошибка обновления данных!");
+        } catch (Exception e) {
+            output.println("Ошибка обновления данных! " + e.getMessage());
         }
     }
 }

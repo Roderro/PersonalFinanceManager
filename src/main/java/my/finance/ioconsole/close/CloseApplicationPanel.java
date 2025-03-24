@@ -3,9 +3,12 @@ package my.finance.ioconsole.close;
 import my.finance.ioconsole.AbstractPanel;
 import my.finance.ioconsole.Panel;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Lazy
+@Profile("console")
 public class CloseApplicationPanel extends AbstractPanel {
 
     public CloseApplicationPanel() {

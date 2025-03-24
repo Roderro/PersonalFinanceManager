@@ -6,22 +6,21 @@ import my.finance.models.BudgetCategory;
 import my.finance.models.User;
 import my.finance.repository.AppTransactionRepository;
 import my.finance.repository.BudgetCategoryRepository;
-import my.finance.repository.UserRepository;
-import my.finance.repository.WalletRepository;
 import my.finance.security.AppSession;
-import my.finance.security.Authentication;
+import my.finance.service.authentication.AuthenticationService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 @Order(1)
+@Profile("test")
 public class InitDataLoader implements CommandLineRunner {
-    private final UserRepository userRepository ;
     private final BudgetCategoryRepository budgetCategoryRepository;
     private final AppTransactionRepository appTransactionRepository ;
-    private final Authentication authentication;
+    private final AuthenticationService authenticationService;
     private final AppSession appSession;
 
 
@@ -29,14 +28,8 @@ public class InitDataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String newLogin = "Test";
         String newPassword = "1234";
-        String hashNewPassword = authentication.getHashFunc().hash(newPassword);
-        User newUser = new User(newLogin, hashNewPassword);
-        try {
-            userRepository.save(newUser);
-            appSession.setUser(newUser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        User newUser = authenticationService.registerNewUser(newLogin, newPassword);
+        appSession.setUser(newUser);
         BudgetCategory work = new BudgetCategory(newUser.getWallet(), "Работа");
         BudgetCategory some = new BudgetCategory(newUser.getWallet(), "Подработка");
         BudgetCategory food = new BudgetCategory(newUser.getWallet(), "еда", 15000);

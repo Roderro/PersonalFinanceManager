@@ -1,12 +1,14 @@
 package my.finance.ioconsole.main.management.appTransaction;
 
+import my.finance.exception.appTransaction.AppTransactionCreatedException;
 import my.finance.ioconsole.AbstractPanel;
 import my.finance.ioconsole.main.management.category.AddCategoryPanel;
 import my.finance.models.AppTransaction;
 import my.finance.models.BudgetCategory;
-import org.hibernate.HibernateException;
-import org.springframework.beans.factory.annotation.Autowired;
+import my.finance.service.appTransaction.AppTransactionService;
+import my.finance.service.budgetCategory.BudgetCategoryService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
@@ -14,18 +16,20 @@ import java.util.List;
 
 @Component
 @Lazy
+@Profile("console")
 public class AddAppTransactionPanel extends AbstractPanel {
     static final String TEXT = "Добавление транзакции";
-    private AddCategoryPanel addCategoryPanel;
+    private final AddCategoryPanel addCategoryPanel;
+    private final AppTransactionService appTransactionService;
+    private final BudgetCategoryService budgetCategoryService;
 
-    public AddAppTransactionPanel() {
+    public AddAppTransactionPanel(AddCategoryPanel addCategoryPanel, AppTransactionService appTransactionService, BudgetCategoryService budgetCategoryService) {
         super();
+        this.addCategoryPanel = addCategoryPanel;
+        this.appTransactionService = appTransactionService;
+        this.budgetCategoryService = budgetCategoryService;
     }
 
-    @Autowired
-    public void setAddCategoryPanel(AddCategoryPanel addCategoryPanel) {
-        this.addCategoryPanel = addCategoryPanel;
-    }
 
     @Override
     public void action() {
@@ -38,7 +42,7 @@ public class AddAppTransactionPanel extends AbstractPanel {
                     selectedCategory, inputDescription);
             addAppTransaction(newAppTransaction);
             if (!isIncome) {
-                double sumByCategory = appTransactionRepository.sumByCategory(selectedCategory.getId());
+                double sumByCategory = appTransactionService.sumByCategory(selectedCategory.getId());
                 double remains = selectedCategory.getBudgetLimit() + sumByCategory;
                 if (remains < 0) {
                     output.printf("!!!Внимание вы превысили лимит по категории %s на %.2f!%n",
@@ -53,15 +57,17 @@ public class AddAppTransactionPanel extends AbstractPanel {
 
     private void addAppTransaction(AppTransaction newAppTransaction) {
         try {
-            appTransactionRepository.save(newAppTransaction);
-        } catch (HibernateException e) {
-            throw new RuntimeException("Не удалось добавить транзакцию, попробуйте снова!");
+            appTransactionService.save(newAppTransaction);
+        } catch (AppTransactionCreatedException e) {
+            throw new RuntimeException("Не удалось создать транзакцию");
+        } catch (Exception e) {
+            throw new RuntimeException("Произошла ошибка: " + e.getMessage());
         }
     }
 
 
     private BudgetCategory getUserTypedCategory(boolean isIncome) {
-        List<BudgetCategory> userCategories = budgetCategoryRepository.findAllUserTypedCategories(appSession.getUser(), isIncome);
+        List<BudgetCategory> userCategories = budgetCategoryService.findAllUserTypedCategories(isIncome);
         String type = isIncome ? "дохода" : "расхода";
         output.println("Выберете категорию транзакции %s:".formatted(type));
         output.fPrintListCategories(userCategories, 0, isIncome);

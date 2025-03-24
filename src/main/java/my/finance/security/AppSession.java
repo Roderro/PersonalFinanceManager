@@ -7,9 +7,9 @@ import my.finance.models.User;
 import my.finance.models.Wallet;
 import org.springframework.stereotype.Component;
 
+@Component
 @Setter
 @Getter
-@Component
 @NoArgsConstructor
 public class AppSession {
     User user;
@@ -18,10 +18,11 @@ public class AppSession {
         this.user = user;
     }
 
-    public void logout(){this.user = null;}
-
-    public Wallet getWallet(){
-        return user.getWallet();
+    public void logout() {
+        this.user = null;
     }
 
+    public Wallet getWallet() {
+        return user.getWallet();
+    }
 }

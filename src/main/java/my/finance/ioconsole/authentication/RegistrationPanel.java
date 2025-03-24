@@ -1,24 +1,23 @@
 package my.finance.ioconsole.authentication;
 
-import jakarta.persistence.PersistenceException;
+import my.finance.exception.user.UserCreatedException;
+import my.finance.exception.user.UsernameAlreadyExistsException;
 import my.finance.ioconsole.AbstractPanel;
 import my.finance.ioconsole.main.MainPanel;
 import my.finance.models.User;
-import my.finance.security.AppSession;
-import my.finance.security.Authentication;
-import my.finance.security.StandartAuthentication;
-import org.springframework.context.annotation.Lazy;
+import my.finance.service.authentication.AuthenticationService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("console")
 public class RegistrationPanel extends AbstractPanel {
     static final String TEXT = "Регистрация";
+    private final AuthenticationService authenticationService;
 
-    private final Authentication authentication;
-
-    public RegistrationPanel(Authentication authentication) {
+    public RegistrationPanel(AuthenticationService authenticationService) {
         super();
-        this.authentication = authentication;
+        this.authenticationService = authenticationService;
     }
 
 
@@ -28,16 +27,14 @@ public class RegistrationPanel extends AbstractPanel {
         String newLogin = input.next();
         output.print("Введите ваш пароль: ");
         String newPassword = input.next();
-        String hashNewPassword = authentication.getHashFunc().hash(newPassword);
-        User newUser = new User(newLogin, hashNewPassword);
         try {
-            userRepository.save(newUser);
+            User newUser = authenticationService.registerNewUser(newLogin, newPassword);
             appSession.setUser(newUser);
             nextPanelClass = MainPanel.class;
-        } catch (PersistenceException e) {
-            output.println("Логин уже существует!");
-        } catch (Exception e) {
-            System.out.println("Что-то пошло не так попробуйте снова!");
+        } catch (UsernameAlreadyExistsException e) {
+            output.println(e.getMessage());
+        } catch (UserCreatedException e) {
+            output.println(e.getMessage() + ", попробуйте снова");
         }
     }
 }

@@ -1,6 +1,8 @@
 package my.finance.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -8,6 +10,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transactions")
+@Data
+@NoArgsConstructor
 public class AppTransaction {
 
     @Id
@@ -37,91 +41,27 @@ public class AppTransaction {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public AppTransaction() {
-    }
-
     public AppTransaction(Wallet wallet, double amount, BudgetCategory budgetCategory, String description) {
         this.wallet = wallet;
         this.budgetCategory = budgetCategory;
-        if (budgetCategory.isIncome()) {
-            this.amount = Math.abs(amount);
-        } else {
-            this.amount = -Math.abs(amount);
-        }
+        this.amount = setSignAmount(budgetCategory.isIncome(), amount);
         this.description = description;
-    }
-
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Wallet getWallet() {
-        return wallet;
-    }
-
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
-    }
-
-    public double getAmount() {
-        return amount;
     }
 
     public void setAmount(double amount) {
-        if (isIncome())
-            this.amount = Math.abs(amount);
+        this.amount = setSignAmount(isIncome(), amount);
+    }
+
+    private double setSignAmount(boolean isIncome, double amount) {
+        if (isIncome)
+            return Math.abs(amount);
         else {
-            this.amount = -Math.abs(amount);
+            return -Math.abs(amount);
         }
-    }
-
-    public BudgetCategory getBudgetCategory() {
-        return budgetCategory;
-    }
-
-    public void setBudgetCategory(BudgetCategory budgetCategory) {
-        this.budgetCategory = budgetCategory;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public boolean isIncome() {
         return this.budgetCategory.isIncome();
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public String toString() {
-        return "AppTransaction{" +
-                "budgetCategory=" + budgetCategory +
-                ", description='" + description + '\'' +
-                ", amount=" + amount +
-                '}';
-    }
 }

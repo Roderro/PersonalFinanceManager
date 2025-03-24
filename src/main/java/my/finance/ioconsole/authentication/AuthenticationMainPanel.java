@@ -3,23 +3,20 @@ package my.finance.ioconsole.authentication;
 import my.finance.ioconsole.AbstractMainPanel;
 import my.finance.ioconsole.close.CloseApplicationPanel;
 import my.finance.ioconsole.Panel;
-import my.finance.security.AppSession;
-import my.finance.security.Authentication;
-import my.finance.security.StandartAuthentication;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
 
 
 @Component
+@Profile("console")
 public class AuthenticationMainPanel extends AbstractMainPanel {
     static final String TEXT = "Аутентификация";
-    private final Authentication authentication;
 
 
-    public AuthenticationMainPanel(AppSession appSession,Authentication authentication) {
+    public AuthenticationMainPanel() {
         super();
-        this.authentication = authentication;
     }
 
     @Override
@@ -30,7 +27,6 @@ public class AuthenticationMainPanel extends AbstractMainPanel {
     @Override
     protected Class<? extends Panel> getSpecialPanel(int inputNumber) {
         if (inputNumber == children.size() + 1) {
-            appSession = null;
             return CloseApplicationPanel.class;
         } else throw new InputMismatchException();
     }

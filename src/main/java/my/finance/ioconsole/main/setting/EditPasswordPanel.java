@@ -1,39 +1,38 @@
 package my.finance.ioconsole.main.setting;
 
 import my.finance.ioconsole.AbstractPanel;
-import my.finance.security.AppSession;
-import my.finance.security.Authentication;
-import my.finance.security.StandartAuthentication;
+import my.finance.models.User;
+import my.finance.service.user.UserService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 @Lazy
+@Profile("console")
 public class EditPasswordPanel extends AbstractPanel {
     static final String TEXT = "Изменить пароль";
-    private final Authentication authentication;
+    private final UserService userService;
 
 
-    public EditPasswordPanel(Authentication authentication) {
+    public EditPasswordPanel(UserService userService) {
         super();
-        this.authentication = authentication;
+        this.userService = userService;
     }
 
     @Override
     public void action() {
         output.print("Введите ваш пароль: ");
         String oldPassword = input.next();
-        String oldPasswordHash = appSession.getUser().getPassword();
-        if (oldPasswordHash.equals(authentication.getHashFunc().hash(oldPassword))) {
+        if (userService.verificationPassword(appSession.getUser(), oldPassword)) {
             try {
                 output.print("Введите новый пароль: ");
-                String newPasswordHash = authentication.getHashFunc().hash(input.nextLine());
-                appSession.getUser().setPassword(newPasswordHash);
-                userRepository.save(appSession.getUser());
+                String newPassword = input.nextLine();
+                User updatedUser = userService.changePassword(appSession.getUser().getId(), newPassword);
+                appSession.setUser(updatedUser);
                 output.println("Пароль изменен!");
             } catch (Exception e) {
-                appSession.getUser().setPassword(oldPasswordHash);
-                output.println("Не удалось поменять пароль");
+                output.println("Не удалось поменять пароль" + e.getMessage());
             }
         } else {
             output.println("Введен не верный пароль");

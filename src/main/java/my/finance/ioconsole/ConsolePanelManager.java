@@ -1,10 +1,12 @@
 package my.finance.ioconsole;
 
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PanelManager implements Manager {
+@Profile("console")
+public class ConsolePanelManager implements Manager {
 
 
     public void manage(Panel panel) {

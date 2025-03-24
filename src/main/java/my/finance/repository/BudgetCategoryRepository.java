@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -23,5 +24,7 @@ public interface BudgetCategoryRepository extends JpaRepository<BudgetCategory, 
     public default List<BudgetCategory> findAllUserTypedCategories(User user, boolean isIncome) {
         return findAllByWalletAndIsIncome(user.getWallet(), isIncome);
     }
+
+    public Optional<BudgetCategory> findByCategoryName(String categoryName);
 
 }

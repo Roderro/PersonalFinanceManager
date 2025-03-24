@@ -1,22 +1,25 @@
 package my.finance.ioconsole.authentication;
 
+import my.finance.exception.user.IncorrectUserCredentialException;
+import my.finance.exception.user.UserNotFoundException;
 import my.finance.ioconsole.AbstractPanel;
 import my.finance.ioconsole.main.MainPanel;
 import my.finance.security.AppSession;
-import my.finance.security.Authentication;
-import my.finance.security.StandartAuthentication;
+import my.finance.service.authentication.AuthenticationService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 @Component
+@Lazy
+@Profile("console")
 public class LoginPanel extends AbstractPanel {
     static final String TEXT = "Вход";
-    private final Authentication authentication;
+    private final AuthenticationService authenticationService;
 
-    public LoginPanel(Authentication authentication) {
+    public LoginPanel(AuthenticationService authenticationService) {
         super();
-        this.authentication = authentication;
+        this.authenticationService = authenticationService;
     }
 
     @Override
@@ -25,12 +28,11 @@ public class LoginPanel extends AbstractPanel {
         String login = input.next();
         output.print("Введите ваш пароль: ");
         String password = input.next();
-        Optional<AppSession> newSession = authentication.authenticate(login, password);
-        if (newSession.isPresent()) {
-            this.appSession = newSession.get();
+        try {
+            AppSession session = authenticationService.getAuthentication(login, password);
             nextPanelClass = MainPanel.class;
-            return;
+        } catch (UserNotFoundException | IncorrectUserCredentialException e) {
+            output.println(e.getMessage());
         }
-        output.println("Введены не верные данные!");
     }
 }

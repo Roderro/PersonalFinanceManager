@@ -1,35 +1,38 @@
 package my.finance.ioconsole.main.setting;
 
-import jakarta.persistence.PersistenceException;
+
+import my.finance.exception.user.UsernameAlreadyExistsException;
 import my.finance.ioconsole.AbstractPanel;
+import my.finance.models.User;
+import my.finance.service.user.UserService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 @Lazy
+@Profile("console")
 public class EditLoginPanel extends AbstractPanel {
     static final String TEXT = "Изменить логин";
+    private final UserService userService;
 
-
-    public EditLoginPanel() {
+    public EditLoginPanel(UserService userService) {
         super();
+        this.userService = userService;
     }
 
     @Override
     public void action() {
         output.print("Введите новый логин:");
-        String oldLogin = appSession.getUser().getLogin();
         try {
             String newLogin = input.next();
-            appSession.getUser().setLogin(newLogin);
-            userRepository.save(appSession.getUser());
-            output.println("Логин изменен!");
-        } catch (PersistenceException e) {
-            output.println("Логин уже существует!");
-            appSession.getUser().setLogin(oldLogin);
+            User updatedUser = userService.changeLogin(appSession.getUser().getId(), newLogin);
+            appSession.setUser(updatedUser);
+            output.println("Логин изменен на: " + newLogin);
+        } catch (UsernameAlreadyExistsException e) {
+            output.println(e.getMessage());
         } catch (Exception e) {
-            appSession.getUser().setLogin(oldLogin);
-            output.println("Не удалось изменить логин!");
+            output.println("Не удалось изменить логин!" + e.getMessage());
         }
     }
 }

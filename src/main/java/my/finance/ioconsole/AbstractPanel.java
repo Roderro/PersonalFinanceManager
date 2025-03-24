@@ -2,8 +2,10 @@ package my.finance.ioconsole;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Setter;
+import my.finance.models.Wallet;
 import my.finance.repository.*;
 import my.finance.security.AppSession;
+import my.finance.service.wallet.WalletService;
 import my.finance.transport.Input;
 
 import my.finance.transport.Output;
@@ -40,27 +42,10 @@ public abstract class AbstractPanel implements Panel {
     @Autowired
     protected Output output;
     @Autowired
-    protected UserRepository userRepository;
-    @Autowired
-    protected WalletRepository walletRepository;
-    @Autowired
-    protected BudgetCategoryRepository budgetCategoryRepository;
-    @Autowired
-    protected AppTransactionRepository appTransactionRepository;
-    @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    private WalletService walletService;
 
-
-//    public AbstractPanel(AppSession appSession, Input input, Output output, UserRepository userRepository, WalletRepository walletRepository, BudgetCategoryRepository budgetCategoryRepository, AppTransactionRepository appTransactionRepository) {
-//        this.appSession = appSession;
-//        this.input = input;
-//        this.output = output;
-//        this.userRepository = userRepository;
-//        this.walletRepository = walletRepository;
-//        this.budgetCategoryRepository = budgetCategoryRepository;
-//        this.appTransactionRepository = appTransactionRepository;
-//        this.parentClass = this.nextPanelClass = getClassParentPanel();
-//    }
 
     @PostConstruct
     public void init() {
@@ -71,10 +56,9 @@ public abstract class AbstractPanel implements Panel {
         String info = "Не авторизован";
         if (checkAuthorizedUser()) {
             String login = appSession.getUser().getLogin();
-            double balance = walletRepository.calculateBalance(appSession.getWallet().getId());
-            appSession.getWallet().setBalance(balance);
-            walletRepository.save(appSession.getWallet());
-            info = String.format("Логин: %s Баланс: %.2f", login, balance);
+            Wallet wallet = walletService.calculateBalanceAndUpdate(appSession.getWallet());
+            appSession.getUser().setWallet(wallet);
+            info = String.format("Логин: %s Баланс: %.2f", login, wallet.getBalance());
         }
         output.printLine(info.length());
         output.println(info);
@@ -93,6 +77,7 @@ public abstract class AbstractPanel implements Panel {
 
     public final Panel nextPanel() {
         Class<? extends Panel> nextClass = nextPanelClass;
+        nextPanelClass = parentClass;
         return applicationContext.getBean(nextClass);
     }
 

@@ -4,6 +4,7 @@ import my.finance.utils.DatePeriodHelper;
 import my.finance.security.AppSession;
 import my.finance.transport.ConsoleOutput;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.util.InputMismatchException;
 
 @Component
 @Lazy
+@Profile("console")
 public class ReportForPeriod extends AbstractReportForPeriodPanel {
     static final String TEXT = "Отчет за определенный период";
 
