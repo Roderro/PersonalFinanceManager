@@ -79,7 +79,8 @@
 
 * Java 22+
 * Maven
-* H2 Database
+* Postgres
+* Spring
 * Hibernate
 
 
